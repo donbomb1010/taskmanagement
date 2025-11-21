@@ -1,0 +1,261 @@
+<style>
+    /* Modal styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        display: flex; /* Use flexbox to center content */
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        width: 90%;
+        max-width: 500px;
+        animation: scaleIn 0.3s ease-out forwards;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .close-button {
+        color: #aaa;
+        font-size: 2rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .close-button:hover,
+    .close-button:focus {
+        color: var(--primary-black);
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 0.9rem;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        font-size: 1rem;
+        color: var(--text-main);
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group textarea:focus {
+        border-color: var(--primary-black);
+    }
+
+    .form-group textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .skills-input-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        padding: 8px;
+        margin-bottom: 0.5rem;
+        min-height: 44px;
+    }
+
+    .skill-tag {
+        background-color: #F3F4F6;
+        color: var(--text-main);
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .skill-tag .remove-skill {
+        cursor: pointer;
+        font-weight: bold;
+        color: #9CA3AF;
+        transition: color 0.2s;
+    }
+    .skill-tag .remove-skill:hover {
+        color: var(--primary-black);
+    }
+
+    .skills-add-input {
+        flex-grow: 1;
+        border: none;
+        outline: none;
+        padding: 5px 0;
+        font-size: 1rem;
+        min-width: 80px;
+    }
+
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end; /* Buttons right align */
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #E5E7EB;
+    }
+
+    .modal-actions .btn-cancel {
+        background: transparent;
+        border: none;
+        color: var(--text-gray);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .modal-actions .btn-cancel:hover {
+        color: var(--primary-black);
+    }
+
+    .modal-actions .btn-save {
+        background: var(--primary-black);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .modal-actions .btn-save:hover {
+        background: #333;
+    }
+
+    /* Avatar Upload */
+    .avatar-upload-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #F3F4F6;
+    }
+    .avatar-preview {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #E5E7EB;
+        background: #f0f0f0;
+    }
+    .avatar-upload-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .btn-upload-avatar {
+        background: #F3F4F6;
+        border: 1px solid #E5E7EB;
+        color: var(--text-main);
+        padding: 8px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: 0.2s;
+    }
+    .btn-upload-avatar:hover {
+        background: #E5E7EB;
+    }
+    .file-input {
+        display: none; /* Hide default file input */
+    }
+
+</style>
+
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Profile</h2>
+            <span class="close-button" onclick="closeEditProfileModal()">&times;</span>
+        </div>
+
+        <div class="avatar-upload-section">
+            <img id="modalAvatarPreview" src="https://ui-avatars.com/api/?name=User&size=128" alt="Avatar Preview" class="avatar-preview">
+            <div class="avatar-upload-buttons">
+                <input type="file" id="avatarFileInput" class="file-input" accept="image/*">
+                <button class="btn-upload-avatar" onclick="document.getElementById('avatarFileInput').click()">Change Photo</button>
+                <button class="btn-upload-avatar" style="color: #EF4444; border-color: #EF4444;" onclick="removeAvatar()">Remove</button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="editFullName">Full Name</label>
+            <input type="text" id="editFullName" placeholder="Rahul V.">
+        </div>
+
+        <div class="form-group">
+            <label for="editRole">Role</label>
+            <input type="text" id="editRole" placeholder="Senior Product Manager">
+        </div>
+
+        <div class="form-group">
+            <label for="editLocation">Location</label>
+            <input type="text" id="editLocation" placeholder="Mumbai, India">
+        </div>
+
+        <div class="form-group">
+            <label for="editAboutMe">About Me</label>
+            <textarea id="editAboutMe" placeholder="Tell us about yourself..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="editSkills">Skills (Press Enter to add)</label>
+            <div id="skillsInputWrapper" class="skills-input-wrapper">
+                <input type="text" id="editSkillsInput" class="skills-add-input" placeholder="Add a skill">
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeEditProfileModal()">Cancel</button>
+            <button class="btn-save" onclick="saveProfileChanges()">Save Changes</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AProjectO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-black: #000000;
+            --secondary-gray: #F4F6F8;
+            --text-dark: #1A1A1A;
+            --text-light: #6B7280;
+            --white: #ffffff;
+            --border-color: #E5E7EB;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--secondary-gray); display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-container { background-color: var(--white); padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); width: 100%; max-width: 400px; }
+        .logo-area { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+        .logo-icon { background-color: var(--primary-black); color: var(--white); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+        .logo-text { font-weight: 700; font-size: 1.2rem; color: var(--primary-black); }
+        h2 { margin-bottom: 0.5rem; color: var(--text-dark); font-size: 1.8rem; }
+        p.subtitle { color: var(--text-light); margin-bottom: 2rem; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
+        input { width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1rem; outline: none; transition: border-color 0.3s; }
+        input:focus { border-color: var(--primary-black); }
+        .btn-primary { width: 100%; background-color: var(--primary-black); color: var(--white); padding: 0.9rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.3s; margin-top: 1rem; }
+        .btn-primary:hover { opacity: 0.9; }
+        .footer-text { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-light); }
+        .footer-text a { color: var(--primary-black); text-decoration: none; font-weight: 600; }
+        .footer-text a:hover { text-decoration: underline; }
+        .logo{ height: 60px; width: 60px; margin-top: 13px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-area">
+            <div> <img src="projectify.png" class="logo"></div>
+            <div class="logo-text">Projectify</div>
+        </div>
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Please enter your details to sign in.</p>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-primary">Sign In</button>
+        </form>
+        <p class="footer-text">Don't have an account? <a href="signup.html">Sign up</a></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL6UGG7s7o-MC24qpHS77LgY54jxD0sRI",
+            authDomain: "taskmanagement-60f9b.firebaseapp.com",
+            projectId: "taskmanagement-60f9b",
+            storageBucket: "taskmanagement-60f9b.firebasestorage.app",
+            messagingSenderId: "761115679422",
+            appId: "1:761115679422:web:ee166eb1935bd360aa9cef",
+            measurementId: "G-F55KPBTQ3G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // 🟢 NEW LOGIC: Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Agar user logged in hai, to seedha Dashboard bhej do
+                window.location.href = "dashboard.html";
+            }
+        });
+
+        // Login Logic
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Successful login will trigger onAuthStateChanged above
+                    // But for safety we redirect here too
+                    window.location.href = "dashboard.html";
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                });
+        });
+    </script>
+</body>
+</html>

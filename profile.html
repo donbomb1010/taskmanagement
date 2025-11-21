@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - AProjectO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #F9FAFB;
+            --sidebar-width: 260px;
+            --primary-black: #000000;
+            --text-main: #111827;
+            --text-gray: #6B7280;
+            --border-color: #E5E7EB;
+            --white: #ffffff;
+            --banner-bg: #1F2937;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2.5rem; font-weight: 800; font-size: 1.2rem; }
+        .brand-icon { background: var(--primary-black); color: white; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; }
+        .menu-title { font-size: 0.75rem; color: #9CA3AF; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-gray); text-decoration: none; font-weight: 500; margin-bottom: 0.5rem; transition: 0.2s; }
+        .nav-item:hover:not(.active) { background: #F3F4F6; }
+        .nav-item.active { background-color: var(--primary-black); color: white; }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .avatar-small { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .search-bar { background: #F3F4F6; padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; width: 250px; color: var(--text-gray); }
+        .search-bar input { border: none; background: transparent; outline: none; width: 100%; }
+
+        /* Profile Banner */
+        .profile-header-card { background: white; border-radius: 16px; margin-bottom: 1.5rem; border: 1px solid #E5E7EB; position: relative; overflow: visible; }
+        .banner { height: 150px; background: var(--banner-bg); width: 100%; border-radius: 16px 16px 0 0; }
+        .profile-info-area { padding: 0 2rem 2rem 2rem; display: flex; justify-content: space-between; align-items: flex-end; background: white; border-radius: 0 0 16px 16px; }
+        .profile-left { display: flex; align-items: flex-end; gap: 20px; }
+        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 5px solid white; object-fit: cover; background: #ddd; margin-top: -60px; position: relative; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .profile-texts { padding-bottom: 5px; position: relative; z-index: 5; }
+        .profile-texts h1 { font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
+        .role-text { font-size: 1rem; color: #4B5563; font-weight: 500; margin-bottom: 6px; }
+        .detail-text { font-size: 0.9rem; color: var(--text-gray); display: flex; align-items: center; gap: 8px; }
+        .profile-actions { display: flex; gap: 10px; margin-bottom: 10px; }
+        .btn-outline { border: 1px solid #E5E7EB; padding: 8px 16px; border-radius: 8px; background: white; cursor: pointer; font-weight: 600; display: flex; gap: 5px; align-items: center; }
+        .btn-black { background: black; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; display: flex; gap: 5px; align-items: center; }
+
+        /* Content Grid */
+        .content-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem; }
+        .card { background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+        .card h3 { font-size: 1.1rem; margin-bottom: 1rem; }
+        .card p { color: var(--text-gray); font-size: 0.9rem; line-height: 1.5; }
+        .skills-container { display: flex; gap: 10px; flex-wrap: wrap; }
+        .skill-pill { background: #F3F4F6; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
+
+        /* Stats Row */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-box { background: white; padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .stat-num { font-size: 1.8rem; font-weight: 700; }
+        .stat-label { font-size: 0.8rem; color: var(--text-gray); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+        .stat-icon { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; }
+
+        /* --- TASKS TABS & LIST --- */
+        .tasks-header { display: flex; gap: 25px; border-bottom: 2px solid #F3F4F6; margin-bottom: 1.5rem; }
+        .task-tab { padding-bottom: 10px; cursor: pointer; font-weight: 600; color: #9CA3AF; position: relative; transition: color 0.2s; }
+        .task-tab.active { color: var(--primary-black); border-bottom: 2px solid var(--primary-black); }
+        .task-tab:hover:not(.active) { color: var(--text-main); }
+
+        .task-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #F3F4F6; transition: 0.2s; }
+        .task-left { display: flex; gap: 15px; align-items: center; }
+        
+        .check-circle { font-size: 1.4rem; cursor: pointer; color: #D1D5DB; transition: 0.2s; }
+        .check-circle.checked { color: #10B981; } /* Green */
+        .check-circle:hover { color: #10B981; transform: scale(1.1); }
+
+        .task-info h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 2px; }
+        .task-info span { font-size: 0.8rem; color: var(--text-gray); }
+        .badge-done { background: #D1FAE5; color: #065F46; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+        .badge-pending { background: #FEF2F2; color: #991B1B; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+        .empty-msg { text-align: center; color: #9CA3AF; font-size: 0.9rem; padding: 20px; }
+
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background-color: white; padding: 2rem; border-radius: 16px; width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E5E7EB; padding-bottom: 1rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 8px; font-size: 1rem; outline: none; }
+        .skills-input-wrapper { display: flex; flex-wrap: wrap; gap: 8px; border: 1px solid #E5E7EB; border-radius: 8px; padding: 8px; background: white; }
+        .skill-tag-edit { background: #E5E7EB; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+        .skill-tag-edit span { cursor: pointer; font-weight: bold; color: #666; }
+        .skills-add-input { border: none; outline: none; flex-grow: 1; padding: 5px; font-size: 0.95rem; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem; }
+        .avatar-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
+        .btn-cancel { background: transparent; border: none; color: var(--text-gray); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-save { background: var(--primary-black); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        
+        /* Invite Modal specific */
+        .contacts-input-container { background: white; padding: 10px 15px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #E5E7EB; }
+        .contacts-input { border: none; outline: none; width: 100%; font-size: 0.95rem; color: #555; }
+        .btn-send-invite { width: 100%; background-color: #6366F1; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 1rem; }
+        .logo{ height: 60px; width: 60px; margin-top: 13px; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand"><div><img src="projectify.png" class="logo"></div><div>Projectify</div></div>
+        <div class="menu-title">Main Menu</div>
+        <a href="dashboard.html" class="nav-item"><i class="ri-dashboard-line"></i> Dashboard</a>
+        <a href="projects.html" class="nav-item"><i class="ri-folder-3-line"></i> Projects</a>
+        <a href="notification.html" class="nav-item"><i class="ri-notification-3-line"></i> Notifications</a>
+        <a href="chat.html" class="nav-item"><i class="ri-chat-1-line"></i> Chat</a>
+        <a href="#" class="nav-item active"><i class="ri-user-fill"></i> Profile</a>
+            <a href="about.html" class="nav-item"><i class="ri-information-line"></i> About Us</a>
+        <div class="user-profile">
+            <img src="" class="avatar-small" id="sidebarAvatar">
+            <div class="user-info"><h4 id="sidebarName">...</h4><span style="font-size:0.8rem;">Admin</span></div>
+            <i class="ri-logout-box-r-line" onclick="logout()" style="margin-left: auto; cursor: pointer; color: red;"></i>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h2>Profile</h2>
+            <div class="search-bar"><i class="ri-search-line"></i><input type="text" placeholder="Search..."></div>
+        </header>
+
+        <div class="profile-header-card">
+            <div class="banner"></div>
+            <div class="profile-info-area">
+                <div class="profile-left">
+                    <img src="" class="profile-avatar" id="mainAvatar">
+                    <div class="profile-texts">
+                        <h1 id="mainName">Loading...</h1>
+                        <p class="role-text" id="mainRole">Senior Product Manager</p>
+                        <p class="detail-text">
+                            <i class="ri-mail-line"></i> <span id="mainEmail">...</span> • 
+                            <i class="ri-map-pin-line"></i> <span id="mainLocation">Mumbai, India</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn-outline" onclick="openEditModal()"><i class="ri-pencil-line"></i> Edit Profile</button>
+                    <button class="btn-black" onclick="openInviteModal()"><i class="ri-user-add-line"></i> Invite</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="left-col">
+                <div class="card">
+                    <h3>About Me</h3>
+                    <p id="mainAbout">Passionate about building scalable products. Currently managing multiple projects with a focus on minimalist design.</p>
+                </div>
+                <div class="card">
+                    <h3>Skills</h3>
+                    <div class="skills-container" id="mainSkills"></div>
+                </div>
+            </div>
+
+            <div class="right-col">
+                <div class="stats-row">
+                    <div class="stat-box"><div><div class="stat-label">COMPLETED</div><div class="stat-num" id="statCompleted">0</div></div><div class="stat-icon" style="background:#D1FAE5; color:#065F46;"><i class="ri-check-line"></i></div></div>
+                    <div class="stat-box"><div><div class="stat-label">PENDING</div><div class="stat-num" id="statPending">0</div></div><div class="stat-icon" style="background:#FEF3C7; color:#92400E;"><i class="ri-time-line"></i></div></div>
+                    <div class="stat-box"><div><div class="stat-label">EFFICIENCY</div><div class="stat-num">94%</div></div><div class="stat-icon" style="background:#DBEAFE; color:#1E40AF;"><i class="ri-bar-chart-line"></i></div></div>
+                </div>
+
+                <div class="card">
+                    <div class="tasks-header">
+                        <div class="task-tab active" onclick="switchTab('completed')">Completed Tasks</div>
+                        <div class="task-tab" onclick="switchTab('pending')">Pending Tasks</div>
+                    </div>
+
+                    <div id="completedListContainer"></div>
+                    <div id="pendingListContainer" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Edit Profile</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeEditModal()">&times;</span></div>
+            <div style="display:flex; gap:15px; align-items:center; margin-bottom:20px;">
+                <img id="modalAvatarPreview" src="" class="avatar-preview">
+                <div>
+                    <button class="btn-outline" onclick="document.getElementById('avatarInput').click()">Change Photo</button>
+                    <input type="file" id="avatarInput" hidden accept="image/*">
+                    <p id="uploadStatus" style="font-size:0.8rem; color:blue; display:none; margin-top:5px;">Uploading...</p>
+                </div>
+            </div>
+            <div class="form-group"><label>Full Name</label><input type="text" id="inputName"></div>
+            <div class="form-group"><label>Role</label><input type="text" id="inputRole"></div>
+            <div class="form-group"><label>Location</label><input type="text" id="inputLocation"></div>
+            <div class="form-group"><label>About Me</label><textarea id="inputAbout"></textarea></div>
+            <div class="form-group"><label>Skills (Press Enter)</label><div class="skills-input-wrapper" id="skillWrapper"><input type="text" class="skills-add-input" id="skillInput" placeholder="Type & Enter"></div></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeEditModal()">Cancel</button><button class="btn-save" onclick="saveProfile()">Save Changes</button></div>
+        </div>
+    </div>
+
+    <div class="modal" id="inviteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header"><h2>Invite Friend</h2><span style="cursor:pointer; font-size:1.5rem;" onclick="closeInviteModal()">&times;</span></div>
+            <p style="color:#6B7280; margin-bottom:1.5rem; font-size:0.9rem;">Enter email address to invite.</p>
+            <div class="contacts-input-container"><input type="email" class="contacts-input" id="inviteEmail" placeholder="friend@example.com"><i class="ri-mail-send-line" style="color:#6366F1;"></i></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeInviteModal()">Cancel</button><button class="btn-send-invite" onclick="sendInvite()">Send Invite</button></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, arrayUnion, collection, query, where, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL6UGG7s7o-MC24qpHS77LgY54jxD0sRI",
+            authDomain: "taskmanagement-60f9b.firebaseapp.com",
+            projectId: "taskmanagement-60f9b",
+            storageBucket: "taskmanagement-60f9b.firebasestorage.app",
+            messagingSenderId: "761115679422",
+            appId: "1:761115679422:web:ee166eb1935bd360aa9cef",
+            measurementId: "G-F55KPBTQ3G"
+        };
+
+        const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dl6gzgu6i/image/upload";
+        const CLOUDINARY_UPLOAD_PRESET = "NEWSIMAGE";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let currentSkills = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                    const avatar = user.photoURL ? user.photoURL : `https://ui-avatars.com/api/?name=${user.displayName}&background=000&color=fff`;
+                 document.getElementById('sidebarName').innerText = user.displayName || "User" ;
+            document.getElementById('sidebarAvatar').src = avatar;
+                updateUIBasic(user.displayName, user.email, user.photoURL);
+                
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.skills) currentSkills = data.skills;
+                    updateUIExtended(data.role, data.location, data.about, currentSkills);
+                    if(data.photoURL && data.photoURL !== user.photoURL) updateUIBasic(user.displayName, user.email, data.photoURL);
+                } else {
+                    renderSkills(currentSkills);
+                }
+                loadTasks(user.email); // Load tasks in real-time
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        function updateUIBasic(name, email, photoURL) {
+            const avatar = photoURL ? photoURL : `https://ui-avatars.com/api/?name=${name}&background=000&color=fff`;
+            const avatarLg = photoURL ? photoURL : `https://ui-avatars.com/api/?name=${name}&background=random&size=128`;
+            document.getElementById('sidebarName').innerText = name;
+            document.getElementById('sidebarAvatar').src = avatar;
+            document.getElementById('mainName').innerText = name;
+            document.getElementById('mainEmail').innerText = email;
+            document.getElementById('mainAvatar').src = avatarLg;
+            document.getElementById('modalAvatarPreview').src = avatarLg;
+        }
+
+        function updateUIExtended(role, location, about, skills) {
+            if(role) document.getElementById('mainRole').innerText = role;
+            if(location) document.getElementById('mainLocation').innerText = location;
+            if(about) document.getElementById('mainAbout').innerText = about;
+            if(skills) { currentSkills = skills; renderSkills(skills); }
+        }
+
+        function renderSkills(skills) {
+            const container = document.getElementById('mainSkills');
+            container.innerHTML = skills.map(s => `<span class="skill-pill">${s}</span>`).join('');
+        }
+
+        // --- TASKS LOGIC ---
+        window.switchTab = (tabName) => {
+            const tabs = document.querySelectorAll('.task-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if(tabName === 'completed') {
+                document.getElementById('completedListContainer').style.display = 'block';
+                document.getElementById('pendingListContainer').style.display = 'none';
+            } else {
+                document.getElementById('completedListContainer').style.display = 'none';
+                document.getElementById('pendingListContainer').style.display = 'block';
+            }
+        }
+
+        function loadTasks(email) {
+            const q = query(collection(db, "tasks"), where("assignedTo", "==", email));
+            
+            onSnapshot(q, (snapshot) => {
+                const completedContainer = document.getElementById('completedListContainer');
+                const pendingContainer = document.getElementById('pendingListContainer');
+                
+                completedContainer.innerHTML = "";
+                pendingContainer.innerHTML = "";
+                
+                let compCount = 0;
+                let pendCount = 0;
+
+                snapshot.forEach(doc => {
+                    const task = doc.data();
+                    const isCompleted = task.status === 'Completed';
+                    
+                    const icon = isCompleted ? "ri-checkbox-circle-line" : "ri-checkbox-blank-circle-line";
+                    const checkClass = isCompleted ? "checked" : "";
+                    const colorClass = isCompleted ? "#10B981" : "#D1D5DB";
+
+                    const html = `
+                        <div class="task-row">
+                            <div class="task-left">
+                                <i class="${icon} check-circle ${checkClass}" style="color:${colorClass}" onclick="toggleTaskStatus('${doc.id}', '${task.status}')"></i>
+                                <div class="task-info">
+                                    <h4 style="${isCompleted ? 'text-decoration:line-through; color:gray' : ''}">${task.title}</h4>
+                                    <span>${task.projectName || 'Project'} • Due: ${task.endDate || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <span class="${isCompleted ? 'badge-done' : 'badge-pending'}">${task.status}</span>
+                        </div>
+                    `;
+
+                    if(isCompleted) {
+                        completedContainer.innerHTML += html;
+                        compCount++;
+                    } else {
+                        pendingContainer.innerHTML += html;
+                        pendCount++;
+                    }
+                });
+
+                document.getElementById('statCompleted').innerText = compCount;
+                document.getElementById('statPending').innerText = pendCount;
+
+                if(compCount === 0) completedContainer.innerHTML = '<div class="empty-msg">No completed tasks.</div>';
+                if(pendCount === 0) pendingContainer.innerHTML = '<div class="empty-msg">No pending tasks.</div>';
+            });
+        }
+
+        window.toggleTaskStatus = async (id, currentStatus) => {
+            const newStatus = currentStatus === 'Completed' ? 'Pending' : 'Completed';
+            try { await updateDoc(doc(db, "tasks", id), { status: newStatus }); } catch(e) { console.error(e); }
+        }
+
+        // --- MODAL LOGIC ---
+        window.openEditModal = () => {
+            document.getElementById('editModal').classList.add('active');
+            document.getElementById('inputName').value = document.getElementById('mainName').innerText;
+            document.getElementById('inputRole').value = document.getElementById('mainRole').innerText;
+            document.getElementById('inputLocation').value = document.getElementById('mainLocation').innerText;
+            document.getElementById('inputAbout').value = document.getElementById('mainAbout').innerText;
+            renderEditSkills();
+        };
+        window.closeEditModal = () => document.getElementById('editModal').classList.remove('active');
+        window.openInviteModal = () => document.getElementById('inviteModal').classList.add('active');
+        window.closeInviteModal = () => document.getElementById('inviteModal').classList.remove('active');
+
+        function renderEditSkills() {
+            const wrapper = document.getElementById('skillWrapper');
+            const existingTags = wrapper.querySelectorAll('.skill-tag-edit');
+            existingTags.forEach(t => t.remove());
+            currentSkills.forEach(skill => {
+                const tag = document.createElement('div');
+                tag.className = 'skill-tag-edit';
+                tag.innerHTML = `${skill} <span onclick="removeSkill('${skill}')">&times;</span>`;
+                wrapper.insertBefore(tag, document.getElementById('skillInput'));
+            });
+        }
+        window.removeSkill = (skill) => { currentSkills = currentSkills.filter(s => s !== skill); renderEditSkills(); };
+        document.getElementById('skillInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); const val = e.target.value.trim(); if (val && !currentSkills.includes(val)) { currentSkills.push(val); e.target.value = ''; renderEditSkills(); }}
+        });
+
+        document.getElementById('avatarInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0]; if(!file) return;
+            document.getElementById('uploadStatus').style.display = 'block';
+            const formData = new FormData(); formData.append('file', file); formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            try {
+                const res = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
+                const data = await res.json();
+                await updateProfile(currentUser, { photoURL: data.secure_url });
+                await setDoc(doc(db, "users", currentUser.uid), { photoURL: data.secure_url }, { merge: true });
+                updateUIBasic(currentUser.displayName, currentUser.email, data.secure_url);
+                document.getElementById('uploadStatus').style.color = "green"; document.getElementById('uploadStatus').innerText = "Done!";
+            } catch(err) { console.error(err); }
+        });
+
+        window.saveProfile = async () => {
+            const newName = document.getElementById('inputName').value;
+            const newRole = document.getElementById('inputRole').value;
+            const newLocation = document.getElementById('inputLocation').value;
+            const newAbout = document.getElementById('inputAbout').value;
+            try {
+                await updateProfile(currentUser, { displayName: newName });
+                await setDoc(doc(db, "users", currentUser.uid), { role: newRole, location: newLocation, about: newAbout, skills: currentSkills }, { merge: true });
+                updateUIBasic(newName, currentUser.email, currentUser.photoURL);
+                updateUIExtended(newRole, newLocation, newAbout, currentSkills);
+                closeEditModal(); alert("Profile Updated!");
+            } catch(e) { alert(e.message); }
+        };
+
+        window.sendInvite = async () => {
+            const email = document.getElementById('inviteEmail').value;
+            if(!email) return alert("Enter email");
+            try {
+                await setDoc(doc(db, "users", currentUser.uid), { friends: arrayUnion(email) }, { merge: true });
+                alert(`Invite sent to ${email}!`); closeInviteModal();
+            } catch(e) { alert(e.message); }
+        }
+
+        window.logout = () => signOut(auth).then(() => window.location.href = "login.html");
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - AProjectO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #F9FAFB;
+            --sidebar-width: 260px;
+            --primary-black: #000000;
+            --text-main: #111827;
+            --text-gray: #6B7280;
+            --border-color: #E5E7EB;
+            --white: #ffffff;
+            --accent-blue: #6366F1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2.5rem; font-weight: 800; font-size: 1.2rem; }
+        .brand-icon { background: var(--primary-black); color: white; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; }
+        .menu-title { font-size: 0.75rem; color: #9CA3AF; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-gray); text-decoration: none; font-weight: 500; margin-bottom: 0.5rem; transition: 0.2s; }
+        .nav-item:hover { background: #F3F4F6; }
+        .nav-item.active { background-color: var(--primary-black); color: white; }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .avatar-small { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 0; overflow-y: auto; }
+        
+        /* About Page Specifics */
+        .hero-section {
+            background-color: var(--white);
+            padding: 4rem 3rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+        .hero-badge { background: #EEF2FF; color: var(--accent-blue); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 1rem; }
+        .hero-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 1.1rem; color: var(--text-gray); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+        .content-wrapper { padding: 3rem; max-width: 1000px; margin: 0 auto; }
+        
+        .grid-values { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 4rem; }
+        .value-card { background: white; padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); transition: 0.2s; }
+        .value-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .value-icon { width: 50px; height: 50px; background: #F9FAFB; border-radius: 12px; display: grid; place-items: center; font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary-black); }
+        .value-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .value-desc { color: var(--text-gray); line-height: 1.5; font-size: 0.95rem; }
+
+        .story-section { display: flex; gap: 3rem; align-items: center; margin-bottom: 4rem; background: white; padding: 2rem; border-radius: 16px; border: 1px solid var(--border-color); }
+        .story-text h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; }
+        .story-text p { color: var(--text-gray); line-height: 1.6; margin-bottom: 1.5rem; }
+        .story-img { width: 100%; height: 250px; object-fit: cover; border-radius: 12px; background-color: #eee; }
+
+        .cta-box { text-align: center; padding: 3rem; background: var(--primary-black); color: white; border-radius: 20px; }
+        .cta-btn { background: white; color: black; padding: 12px 25px; border-radius: 8px; font-weight: 700; text-decoration: none; display: inline-block; margin-top: 1.5rem; transition: 0.2s; }
+        .cta-btn:hover { transform: scale(1.05); }
+
+        /* Footer Styles */
+        .about-footer {
+            text-align: center; margin-top: 4rem; color: #9CA3AF; font-size: 0.9rem; 
+            padding-bottom: 2rem; border-top: 1px solid #E5E7EB; padding-top: 2rem;
+        }
+        .creators-link { color: #111827; text-decoration: none; font-weight: 700; transition: color 0.2s; }
+        .creators-link:hover { color: var(--accent-blue); }
+        .logo{ height: 60px; width: 60px; margin-top: 13px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand"><div> <img src="projectify.png" class="logo"></div><div>Projectify</div></div>
+        <div class="menu-title">Main Menu</div>
+        <a href="dashboard.html" class="nav-item"><i class="ri-dashboard-line"></i> Dashboard</a>
+        <a href="projects.html" class="nav-item"><i class="ri-folder-3-line"></i> Projects</a>
+        <a href="notification.html" class="nav-item"><i class="ri-notification-3-line"></i> Notifications</a>
+        <a href="chat.html" class="nav-item"><i class="ri-chat-1-line"></i> Chat</a>
+        <a href="profile.html" class="nav-item"><i class="ri-user-line"></i> Profile</a>
+        <a href="#" class="nav-item active"><i class="ri-information-line"></i> About Us</a>
+
+        <div class="user-profile">
+            <img src="" class="avatar-small" id="sidebarAvatar">
+            <div class="user-info"><h4 id="sidebarName">...</h4><span style="font-size:0.8rem;">Admin</span></div>
+            <i class="ri-logout-box-r-line" onclick="logout()" style="margin-left: auto; cursor: pointer; color: red;"></i>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="hero-section">
+            <div class="hero-badge">Our Mission</div>
+            <h1 class="hero-title">Simplifying Work for Everyone</h1>
+            <p class="hero-subtitle">Projectify is built to help teams organize, track, and manage their work with clarity and efficiency. We believe productivity shouldn't be complicated.</p>
+        </div>
+
+        <div class="content-wrapper">
+            
+            <div class="grid-values">
+                <div class="value-card">
+                    <div class="value-icon"><i class="ri-rocket-line"></i></div>
+                    <div class="value-title">Speed & Efficiency</div>
+                    <div class="value-desc">We optimize every interaction to be instant. Less waiting, more doing. Built with the latest tech for maximum performance.</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="ri-group-line"></i></div>
+                    <div class="value-title">Collaboration First</div>
+                    <div class="value-desc">Work isn't solitary. Our real-time chat and project sharing features keep your team aligned and connected.</div>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="ri-shield-check-line"></i></div>
+                    <div class="value-title">Secure & Reliable</div>
+                    <div class="value-desc">Your data is yours. We use enterprise-grade security to ensure your project details remain private and safe.</div>
+                </div>
+            </div>
+
+            <div class="story-section">
+                <div class="story-text" style="flex: 1;">
+                    <h2>Our Story</h2>
+                    <p>Projectify started as a solution to a common problem: Project management tools were either too simple to be useful or too complex to understand.</p>
+                    <p>We set out to build the "Goldilocks" solution—a platform that is powerful enough for complex workflows but intuitive enough that you don't need a manual to use it.</p>
+                    <div style="display:flex; gap:15px; margin-top:20px;">
+                        <div><h3 style="font-size:1.5rem; font-weight:800;">20+</h3><span style="color:gray; font-size:0.8rem;">PROJECTS</span></div>
+                        <!-- <div><h3 style="font-size:1.5rem; font-weight:800;">500+</h3><span style="color:gray; font-size:0.8rem;">TASKS COMPLETED</span></div> -->
+                    </div>
+                </div>
+                <div style="flex: 1;">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="story-img" alt="Team working">
+                </div>
+            </div>
+
+            <div class="cta-box">
+                <h2 style="font-size: 2rem; margin-bottom: 10px;">Ready to get organized?</h2>
+                <p style="opacity: 0.8;">Join thousands of users managing their work with Projectify.</p>
+                <a href="dashboard.html" class="cta-btn">Go to Dashboard</a>
+            </div>
+
+            <footer class="about-footer">
+                <p style="margin-bottom: 10px;">&copy; 2025 Projectify Inc. All rights reserved.</p>
+                
+                <p style="font-weight: 500; color: #6B7280;">
+                    Made with <i class="ri-heart-fill" style="color: #EF4444; vertical-align: middle;"></i> by 
+                    <span class="creators-link">Prince Panara</span> 
+                    & 
+                    <span class="creators-link">Shyam Gadara</span>
+                </p>
+            </footer>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL6UGG7s7o-MC24qpHS77LgY54jxD0sRI",
+            authDomain: "taskmanagement-60f9b.firebaseapp.com",
+            projectId: "taskmanagement-60f9b",
+            storageBucket: "taskmanagement-60f9b.firebasestorage.app",
+            messagingSenderId: "761115679422",
+            appId: "1:761115679422:web:ee166eb1935bd360aa9cef",
+            measurementId: "G-F55KPBTQ3G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Sidebar Updates
+                const sbName = document.getElementById('sidebarName');
+                const sbAvatar = document.getElementById('sidebarAvatar');
+                
+                // Fetch User for real avatar
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                let userPhoto = user.photoURL;
+                if (userSnap.exists() && userSnap.data().profileImage) {
+                    userPhoto = userSnap.data().profileImage;
+                } else if (!userPhoto) {
+                    userPhoto = `https://ui-avatars.com/api/?name=${user.displayName}`;
+                }
+
+                if(sbName) sbName.innerText = user.displayName || "User";
+                if(sbAvatar) sbAvatar.src = userPhoto;
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        window.logout = () => signOut(auth).then(() => window.location.href = "login.html");
+    </script>
+</body>
+</html>

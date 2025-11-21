@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AProjectO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #F9FAFB;
+            --sidebar-width: 260px;
+            --primary-black: #000000;
+            --text-main: #111827;
+            --text-gray: #6B7280;
+            --border-color: #E5E7EB;
+            --white: #ffffff;
+            --green-badge: #D1FAE5;
+            --green-text: #065F46;
+            --red-badge: #FEE2E2;
+            --red-text: #991B1B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: var(--white); border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; flex-shrink: 0; animation: slideInLeft 0.5s ease-out forwards; }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2.5rem; font-weight: 800; font-size: 1.2rem; }
+        .brand-icon { background: var(--primary-black); color: white; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; }
+        .menu-title { font-size: 0.75rem; color: #9CA3AF; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-gray); text-decoration: none; font-weight: 500; margin-bottom: 0.5rem; transition: 0.2s; }
+        .nav-item:hover:not(.active) { background: #F3F4F6; }
+        .nav-item.active { background-color: var(--primary-black); color: white; }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .avatar-small { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        
+        /* Main Content */
+        .main-content { flex: 1; padding: 2rem; overflow-y: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; animation: fadeInUp 0.4s ease-out forwards; }
+        .header-title { font-size: 1.25rem; font-weight: 700; }
+        .header-right { display: flex; align-items: center; gap: 20px; }
+        .search-bar { background: #F3F4F6; padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; width: 250px; color: var(--text-gray); }
+        .search-bar input { border: none; background: transparent; outline: none; width: 100%; }
+
+        .greeting-area { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; animation: fadeInUp 0.5s ease-out forwards; }
+        .greeting-text span { font-size: 0.9rem; color: var(--text-gray); }
+        .greeting-text h1 { font-size: 1.8rem; margin-top: 4px; }
+        .btn-create { background: var(--primary-black); color: white; padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; animation: scaleIn 0.5s ease-out forwards; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .stat-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
+        .stat-icon { width: 40px; height: 40px; background: #F9FAFB; border-radius: 10px; display: grid; place-items: center; font-size: 1.2rem; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .badge-green { background: var(--green-badge); color: var(--green-text); }
+        .badge-red { background: var(--red-badge); color: var(--red-text); }
+        .badge-gray { background: #F3F4F6; color: var(--text-gray); }
+        .stat-value { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
+        .stat-label { color: var(--text-gray); font-size: 0.9rem; }
+
+        /* Content Split */
+        .content-split { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; animation: fadeInUp 0.6s ease-out forwards; }
+        
+        /* Projects */
+        .section-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .project-card { background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: 0.2s; border: 1px solid transparent; cursor: pointer; }
+        .project-card:hover { border-color: var(--primary-black); transform: translateY(-3px); }
+        .proj-cat { font-size: 0.75rem; color: #9CA3AF; font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+        .proj-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; }
+        .progress-container { margin-bottom: 1rem; }
+        .progress-bar { height: 8px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary-black); width: 0%; transition: width 1s ease; }
+        .proj-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; color: var(--text-gray); font-size: 0.85rem; }
+
+        /* Tasks */
+        .task-list { background: white; padding: 1.5rem; border-radius: 16px; height: fit-content; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .task-item { display: flex; gap: 12px; margin-bottom: 1.2rem; align-items: flex-start; transition: 0.2s; }
+        .checkbox { width: 20px; height: 20px; border: 2px solid #D1D5DB; border-radius: 4px; cursor: pointer; margin-top: 2px; display: grid; place-items: center; transition: 0.2s; }
+        .checkbox.checked { background: var(--primary-black); border-color: var(--primary-black); color: white; }
+        .task-content h4 { font-size: 0.95rem; font-weight: 500; margin-bottom: 2px; transition: 0.2s; }
+        .task-content span { font-size: 0.75rem; color: var(--text-gray); }
+        .strikethrough { text-decoration: line-through; color: #9CA3AF; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 100; }
+        .modal.active { display: flex; animation: fadeIn 0.2s ease-out forwards; }
+        .modal-content { background: white; padding: 2rem; border-radius: 16px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #E5E7EB; border-radius: 8px; outline: none; }
+.logo{ height: 60px; width: 60px; margin-top: 13px; }
+        /* Animations */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand"><div ><img src="projectify.png" class="logo"></div><div>Projectify</div></div>
+        <div class="menu-title">Main Menu</div>
+        <a href="dashboard.html" class="nav-item active"><i class="ri-dashboard-fill"></i> Dashboard</a>
+        <a href="projects.html" class="nav-item"><i class="ri-folder-3-line"></i> Projects</a>
+        <a href="notification.html" class="nav-item"><i class="ri-notification-3-line"></i> Notifications</a>
+        <a href="chat.html" class="nav-item"><i class="ri-chat-1-line"></i> Chat</a>
+        <a href="profile.html" class="nav-item"><i class="ri-user-line"></i> Profile</a>
+         <a href="about.html" class="nav-item"><i class="ri-information-line"></i> About Us</a>
+
+        <div class="user-profile">
+            <img src="" class="avatar-small" id="sidebarAvatar">
+            <div class="user-info"><h4 id="sidebarName">...</h4><span style="font-size:0.8rem;">Admin</span></div>
+            <i class="ri-logout-box-r-line" onclick="logout()" style="margin-left: auto; cursor: pointer; color: red;"></i>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div class="header-title">Dashboard</div>
+            <div class="header-right">
+                <div class="search-bar"><i class="ri-search-line"></i><input type="text" placeholder="Search..."></div>
+                <a href="notification.html" style="color:inherit;"><i class="ri-notification-3-line" style="font-size: 1.2rem; cursor: pointer;"></i></a>
+            </div>
+        </header>
+
+        <div class="greeting-area">
+            <div class="greeting-text"><span>Overview</span><h1 id="greeting">Good Morning!</h1></div>
+            <!-- <button class="btn-create" onclick="openModal()"><i class="ri-add-line"></i> Quick Project</button> -->
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header"><div class="stat-icon"><i class="ri-folder-line"></i></div><div class="badge badge-green">+ Recent</div></div>
+                <div class="stat-value" id="totalProjects">0</div>
+                <div class="stat-label">Active Projects</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header"><div class="stat-icon"><i class="ri-checkbox-circle-line"></i></div><div class="badge badge-gray" id="completedPercentage">0%</div></div>
+                <div class="stat-value" id="totalCompletedTasks">0</div>
+                <div class="stat-label">Tasks Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header"><div class="stat-icon"><i class="ri-time-line"></i></div><div class="badge badge-red">Urgent</div></div>
+                <div class="stat-value" id="totalPendingTasks">0</div>
+                <div class="stat-label">Pending Tasks</div>
+            </div>
+        </div>
+
+        <div class="content-split">
+            <div class="projects-section">
+                <div class="section-header"><h3>Active Projects</h3><a href="projects.html" style="color: #6B7280; text-decoration: none;">View All</a></div>
+                <div id="projectsContainer"><p style="color: gray;">Loading projects...</p></div>
+            </div>
+
+            <div class="tasks-section">
+                <div class="section-header"><h3>Recent Tasks</h3><i class="ri-add-line" style="cursor: pointer;" onclick="alert('Go to a Project to add tasks.')"></i></div>
+                <div class="task-list" id="taskListContainer">
+                    <p style="color:gray; font-size:0.9rem; text-align:center; padding:20px;">Loading tasks...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 1rem;"><h2>New Project</h2><i class="ri-close-line" onclick="closeModal()" style="font-size: 1.5rem; cursor:pointer;"></i></div>
+            <input type="text" id="newProjectName" placeholder="Project Title">
+            <input type="text" id="newProjectCategory" placeholder="Category">
+            <button class="btn-create" style="width:100%; justify-content:center; margin-top:10px;" onclick="createNewProject()">Create Project</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, addDoc, query, where, onSnapshot, updateDoc, doc, arrayUnion, getDoc,
+            enableIndexedDbPersistence, limit, orderBy 
+        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL6UGG7s7o-MC24qpHS77LgY54jxD0sRI",
+            authDomain: "taskmanagement-60f9b.firebaseapp.com",
+            projectId: "taskmanagement-60f9b",
+            storageBucket: "taskmanagement-60f9b.firebasestorage.app",
+            messagingSenderId: "761115679422",
+            appId: "1:761115679422:web:ee166eb1935bd360aa9cef",
+            measurementId: "G-F55KPBTQ3G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- 1. ENABLE PERSISTENCE ---
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code == 'failed-precondition') { console.log('Persistence failed: Multiple tabs'); } 
+            else if (err.code == 'unimplemented') { console.log('Persistence not supported'); }
+        });
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // Get Real Avatar
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                let userPhoto = user.photoURL;
+                if (userSnap.exists() && userSnap.data().profileImage) {
+                    userPhoto = userSnap.data().profileImage;
+                } else if (!userPhoto) {
+                    userPhoto = `https://ui-avatars.com/api/?name=${user.displayName}`;
+                }
+
+                document.getElementById('sidebarName').innerText = user.displayName || "User";
+                document.getElementById('sidebarAvatar').src = userPhoto;
+                document.getElementById('greeting').innerText = `Good Morning, ${user.displayName ? user.displayName.split(' ')[0] : 'Friend'}!`;
+                
+                loadUserProjects(user.email);
+                loadUserTasks(user.email);
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // --- 1. LOAD ACTIVE PROJECTS ONLY ---
+        function loadUserProjects(email) {
+            const q = query(
+                collection(db, "projects"), 
+                where("access_list", "array-contains", email),
+                orderBy("createdAt", "desc"), // Sort newest
+                limit(20) // Fetch buffer to filter client-side
+            );
+            
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('projectsContainer');
+                container.innerHTML = "";
+                
+                let activeCount = 0;
+                let html = "";
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    
+                    // FILTER: Hide Completed Projects (100%)
+                    if (data.progress >= 100) return; 
+
+                    // Only show top 5 active
+                    if (activeCount >= 5) return; 
+
+                    activeCount++;
+                    const dateStr = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : "N/A";
+                    
+                    html += `
+                        <div class="project-card" onclick="window.location.href='project_details.html?id=${doc.id}'">
+                            <div class="proj-cat">${data.category || 'General'}</div>
+                            <div class="proj-title">${data.name}</div>
+                            <div class="progress-container">
+                                <div class="progress-bar"><div class="progress-fill" style="width: ${data.progress || 0}%"></div></div>
+                            </div>
+                            <div class="proj-footer">
+                                <div class="date"><i class="ri-calendar-line"></i> ${dateStr}</div>
+                                <i class="ri-arrow-right-line"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (activeCount === 0) {
+                    container.innerHTML = "<p style='color:gray; text-align:center; padding:20px;'>No active projects. Great job!</p>";
+                } else {
+                    container.innerHTML = html;
+                }
+                
+                document.getElementById('totalProjects').innerText = activeCount; 
+            });
+        }
+
+        // --- 2. LOAD TASKS & STATS ---
+        function loadUserTasks(email) {
+            const q = query(
+                collection(db, "tasks"), 
+                where("assignedTo", "==", email),
+                orderBy("createdAt", "desc"),
+                limit(10)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('taskListContainer');
+                container.innerHTML = "";
+                
+                let completedCount = 0;
+                let pendingCount = 0;
+                let totalTasks = 0;
+
+                if(snapshot.empty) {
+                    container.innerHTML = "<p style='color:gray; padding:20px; text-align:center'>No tasks yet.</p>";
+                }
+
+                snapshot.forEach((doc) => {
+                    const task = doc.data();
+                    totalTasks++;
+                    const isDone = task.status === 'Completed' || task.status === 'Done';
+                    
+                    if(isDone) completedCount++;
+                    else pendingCount++;
+
+                    const html = `
+                        <div class="task-item">
+                            <div class="checkbox ${isDone ? 'checked' : ''}" onclick="toggleTask('${doc.id}', '${task.status}')">
+                                ${isDone ? '<i class="ri-check-line" style="font-size: 12px;"></i>' : ''}
+                            </div>
+                            <div class="task-content">
+                                <h4 class="${isDone ? 'strikethrough' : ''}">${task.title}</h4>
+                                <span>${task.projectName || 'General'} • ${isDone ? 'Completed' : 'Pending'}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+
+                document.getElementById('totalCompletedTasks').innerText = completedCount;
+                document.getElementById('totalPendingTasks').innerText = pendingCount;
+                const percentage = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+                document.getElementById('completedPercentage').innerText = percentage + "%";
+            });
+        }
+
+        // --- 3. TOGGLE TASK STATUS ---
+        window.toggleTask = async (taskId, currentStatus) => {
+            const newStatus = (currentStatus === 'Done' || currentStatus === 'Completed') ? 'Pending' : 'Completed';
+            try {
+                await updateDoc(doc(db, "tasks", taskId), { status: newStatus });
+            } catch(e) { console.error(e); }
+        }
+
+        // --- 4. QUICK CREATE PROJECT ---
+        window.createNewProject = async () => {
+            const name = document.getElementById('newProjectName').value;
+            const category = document.getElementById('newProjectCategory').value;
+            if(!name) return alert("Project name required");
+
+            try {
+                await addDoc(collection(db, "projects"), {
+                    name: name,
+                    category: category || "Work",
+                    progress: 0,
+                    access_list: [currentUser.email],
+                    createdAt: new Date(),
+                    themeColor: '#000000'
+                });
+                closeModal();
+                alert("Project Created!");
+            } catch (e) { alert(e.message); }
+        }
+
+        window.logout = () => signOut(auth).then(() => window.location.href = "login.html");
+        window.openModal = () => document.getElementById('projectModal').classList.add('active');
+        window.closeModal = () => document.getElementById('projectModal').classList.remove('active');
+    </script>
+</body>
+</html>

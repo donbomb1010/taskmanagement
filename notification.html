@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - AProjectO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root { --bg-color: #F9FAFB; --primary-black: #000000; --text-main: #111827; --text-gray: #6B7280; --border-color: #E5E7EB; --white: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; padding: 2rem; }
+
+        .container { width: 100%; max-width: 700px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: var(--white); padding: 1.5rem; border-radius: 16px; border: 1px solid var(--border-color); animation: fadeInUp 0.4s ease-out forwards; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn { background: #F3F4F6; border: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; color: var(--text-main); text-decoration: none; transition: 0.2s; }
+        .back-btn:hover { background: #E5E7EB; }
+        .header h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+        
+        /* Buttons */
+        .btn-add-friend { background: var(--primary-black); color: white; padding: 10px 16px; border-radius: 8px; cursor: pointer; border: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-add-friend:hover { opacity: 0.8; }
+        
+        .btn-clear { border: none; background: none; cursor: pointer; color: #EF4444; font-weight: 600; transition: 0.2s; }
+        .btn-clear:hover { text-decoration: underline; }
+
+        .notif-list { display: flex; flex-direction: column; gap: 1rem; animation: fadeInUp 0.6s ease-out forwards; }
+        .notif-card { background: white; border-radius: 16px; padding: 1.5rem; display: flex; gap: 1.2rem; align-items: flex-start; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: transform 0.2s; }
+        .notif-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        
+        .notif-icon { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; font-size: 1.4rem; }
+        .icon-invite { background: #EEF2FF; color: #4F46E5; } /* Blue for Projects */
+        .icon-friend { background: #ECFDF5; color: #059669; } /* Green for Friends */
+        .icon-task { background: #FEF3C7; color: #D97706; } /* Orange for Tasks */
+        
+        .notif-content { flex: 1; }
+        .notif-title { font-weight: 700; font-size: 1rem; }
+        .notif-desc { font-size: 0.95rem; color: var(--text-gray); margin: 5px 0 10px 0; }
+        .action-buttons { display: flex; gap: 10px; }
+        .btn-accept { background: var(--primary-black); color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-decline { background: white; border: 1px solid #E5E7EB; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        
+        .empty-state { text-align: center; margin-top: 5rem; color: var(--text-gray); display: none; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 2000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 2rem; border-radius: 16px; width: 400px; animation: fadeInUp 0.2s ease-out forwards; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px; margin: 15px 0; font-size: 1rem; outline: none; }
+        .form-input:focus { border-color: var(--primary-black); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <a href="dashboard.html" class="back-btn"><i class="ri-arrow-left-line" style="font-size: 1.2rem;"></i></a>
+                <h2>Notifications</h2>
+            </div>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <button onclick="openFriendModal()" class="btn-add-friend"><i class="ri-user-add-line"></i> Add Friend</button>
+                <button onclick="clearAllNotifications()" class="btn-clear" id="clearBtn">Clear All</button>
+            </div>
+        </div>
+
+        <div class="notif-list" id="notifContainer">
+            <p style="color:gray; text-align:center; margin-top:20px;">Loading...</p>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <i class="ri-notification-off-line" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.5;"></i>
+            <p>No new notifications</p>
+        </div>
+    </div>
+
+    <div class="modal" id="friendModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:10px;">Send Friend Request</h3>
+            <p style="font-size:0.9rem; color:gray;">Enter the email of the person you want to chat with.</p>
+            <input type="email" id="newFriendEmail" class="form-input" placeholder="friend@email.com">
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="closeFriendModal()" class="btn-decline">Cancel</button>
+                <button onclick="sendFriendRequest()" class="btn-accept">Send Request</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { getFirestore, collection, query, where, onSnapshot, doc, deleteDoc, updateDoc, setDoc, addDoc, getDocs, writeBatch, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL6UGG7s7o-MC24qpHS77LgY54jxD0sRI",
+            authDomain: "taskmanagement-60f9b.firebaseapp.com",
+            projectId: "taskmanagement-60f9b",
+            storageBucket: "taskmanagement-60f9b.firebasestorage.app",
+            messagingSenderId: "761115679422",
+            appId: "1:761115679422:web:ee166eb1935bd360aa9cef",
+            measurementId: "G-F55KPBTQ3G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadNotifications(user.email);
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        function loadNotifications(email) {
+            const q = query(collection(db, "notifications"), where("toEmail", "==", email));
+            
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('notifContainer');
+                container.innerHTML = "";
+                
+                // 1. Collect Data
+                let notifs = [];
+                snapshot.forEach((doc) => {
+                    notifs.push({ id: doc.id, ...doc.data() });
+                });
+
+                // 2. Sort by Timestamp (Newest First)
+                notifs.sort((a, b) => {
+                    const dateA = a.timestamp ? a.timestamp.toDate() : new Date(0);
+                    const dateB = b.timestamp ? b.timestamp.toDate() : new Date(0);
+                    return dateB - dateA;
+                });
+
+                // 3. Filter & Render
+                let visibleCount = 0;
+
+                notifs.forEach((data) => {
+                    // --- SHOW ONLY NEW: Skip if read ---
+                    if (data.read === true) return;
+
+                    visibleCount++;
+                    let iconHtml = '<div class="notif-icon icon-task"><i class="ri-notification-2-line"></i></div>';
+                    let actions = "";
+
+                    // PROJECT INVITE
+                    if(data.type === 'invite') {
+                        iconHtml = '<div class="notif-icon icon-invite"><i class="ri-folder-add-line"></i></div>';
+                        actions = `
+                            <div class="action-buttons">
+                                <button class="btn-accept" onclick="acceptProjectInvite('${data.id}', '${data.projectId}')">Join Project</button>
+                                <button class="btn-decline" onclick="deleteNotif('${data.id}')">Decline</button>
+                            </div>`;
+                    } 
+                    // FRIEND REQUEST
+                    else if (data.type === 'friend_request') {
+                        iconHtml = '<div class="notif-icon icon-friend"><i class="ri-user-smile-line"></i></div>';
+                        actions = `
+                            <div class="action-buttons">
+                                <button class="btn-accept" onclick="acceptFriendRequest('${data.id}', '${data.fromEmail}', '${data.senderUid}')">Accept Friend</button>
+                                <button class="btn-decline" onclick="deleteNotif('${data.id}')">Decline</button>
+                            </div>`;
+                    }
+
+                    const html = `
+                        <div class="notif-card">
+                            ${iconHtml}
+                            <div class="notif-content">
+                                <div class="notif-title">${data.title}</div>
+                                <div class="notif-desc">${data.message}</div>
+                                ${actions}
+                            </div>
+                        </div>`;
+                    container.innerHTML += html;
+                });
+
+                // 4. Handle Empty State
+                if(visibleCount === 0) {
+                    document.getElementById('emptyState').style.display = "block";
+                    document.getElementById('clearBtn').style.display = "none";
+                } else {
+                    document.getElementById('emptyState').style.display = "none";
+                    document.getElementById('clearBtn').style.display = "block";
+                }
+            });
+        }
+
+        // --- LOGIC FOR PROJECT INVITES ---
+        window.acceptProjectInvite = async (notifId, projectId) => {
+            try {
+                const projectRef = doc(db, "projects", projectId);
+                await updateDoc(projectRef, { access_list: arrayUnion(currentUser.email) });
+                await deleteDoc(doc(db, "notifications", notifId));
+                alert("Joined project successfully!");
+            } catch(e) {
+                console.error(e);
+                alert("Error joining project: " + e.message);
+            }
+        }
+
+        // --- LOGIC FOR FRIEND REQUESTS ---
+        window.acceptFriendRequest = async (notifId, senderEmail, senderUid) => {
+            try {
+                // Add Friend (Merge ensures document exists)
+                const myRef = doc(db, "users", currentUser.uid);
+                await setDoc(myRef, { friends: arrayUnion(senderEmail) }, { merge: true });
+
+                if(senderUid) {
+                    const senderRef = doc(db, "users", senderUid);
+                    await setDoc(senderRef, { friends: arrayUnion(currentUser.email) }, { merge: true });
+                }
+
+                await deleteDoc(doc(db, "notifications", notifId));
+                alert("Friend request accepted!");
+            } catch(e) {
+                console.error(e);
+                alert("Error accepting friend: " + e.message);
+            }
+        }
+
+        // --- SEND REQUEST ---
+        window.openFriendModal = () => document.getElementById('friendModal').classList.add('active');
+        window.closeFriendModal = () => document.getElementById('friendModal').classList.remove('active');
+
+        window.sendFriendRequest = async () => {
+            const email = document.getElementById('newFriendEmail').value.trim();
+            if(!email) return alert("Enter an email");
+
+            try {
+                await addDoc(collection(db, "notifications"), {
+                    toEmail: email,
+                    fromEmail: currentUser.email,
+                    fromName: currentUser.displayName || "User",
+                    title: "New Friend Request",
+                    message: `${currentUser.displayName || 'Someone'} wants to add you as a friend.`,
+                    type: "friend_request",
+                    senderUid: currentUser.uid, 
+                    timestamp: serverTimestamp(),
+                    read: false
+                });
+                alert("Friend request sent!");
+                closeFriendModal();
+            } catch(e) {
+                console.error(e);
+                alert("Error sending request: " + e.message);
+            }
+        }
+
+        // --- CLEAR / DELETE LOGIC ---
+        window.deleteNotif = async (id) => {
+            await deleteDoc(doc(db, "notifications", id));
+        }
+
+        window.clearAllNotifications = async () => {
+            if(!confirm("Delete all notifications?")) return;
+
+            try {
+                const q = query(collection(db, "notifications"), where("toEmail", "==", currentUser.email));
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) return alert("No notifications to clear.");
+
+                // Batch Delete
+                const batch = writeBatch(db);
+                snapshot.forEach((doc) => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                // No alert needed, onSnapshot will auto-update the UI to empty
+            } catch (e) {
+                console.error(e);
+                alert("Error clearing notifications: " + e.message);
+            }
+        };
+    </script>
+</body>
+</html>

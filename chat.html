@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - AProjectO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #FFFFFF;
+            --sidebar-width: 260px;
+            --primary-black: #000000;
+            --text-main: #111827;
+            --text-gray: #6B7280;
+            --border-color: #E5E7EB;
+            --chat-bubble-in: #F3F4F6;
+            --chat-bubble-out: #000000;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: #fff; border-right: 1px solid var(--border-color); padding: 1.5rem; display: flex; flex-direction: column; flex-shrink: 0; }
+        .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 2.5rem; font-weight: 800; font-size: 1.2rem; }
+        .brand-icon { background: var(--primary-black); color: white; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; }
+        .menu-title { font-size: 0.75rem; color: #9CA3AF; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-gray); text-decoration: none; font-weight: 500; margin-bottom: 0.5rem; transition: 0.2s; }
+        .nav-item:hover:not(.active) { background: #F3F4F6; }
+        .nav-item.active { background-color: var(--primary-black); color: white; }
+        .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 1.5rem; border-top: 1px solid var(--border-color); }
+        .avatar-small { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        
+
+        /* Chat Layout */
+        .chat-layout { display: flex; flex: 1; height: 100vh; }
+
+        /* Message List Panel */
+        .message-list-panel { width: 350px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; background: white; position: relative; }
+        .msg-header { padding: 1.5rem; position: relative; }
+        .msg-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .msg-title-row h2 { font-size: 1.5rem; font-weight: 700; }
+        
+        .add-btn { 
+            background: black; color: white; width: 35px; height: 35px; 
+            border-radius: 50%; display: grid; place-items: center; cursor: pointer; 
+            transition: 0.2s; position: relative;
+        }
+        .add-btn:hover { opacity: 0.8; transform: scale(1.05); }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute; top: 60px; right: 20px; background: white;
+            border: 1px solid #E5E7EB; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 200px; display: none; flex-direction: column; z-index: 100; overflow: hidden;
+        }
+        .dropdown-menu.show { display: flex; animation: fadeIn 0.2s ease-out; }
+        .dropdown-item { padding: 12px 15px; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 500; color: var(--text-main); cursor: pointer; transition: 0.2s; }
+        .dropdown-item:hover { background: #F9FAFB; color: var(--primary-black); }
+        .dropdown-item i { font-size: 1.1rem; color: #6B7280; }
+
+        .search-box { position: relative; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+        .search-box input { width: 100%; padding: 10px 10px 10px 35px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; background: #fff; }
+
+        .contacts-container { flex: 1; overflow-y: auto; padding: 0 1rem 1rem 1rem; }
+        .contact-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; transition: 0.2s; margin-bottom: 5px; }
+        .contact-item:hover { background: #F9FAFB; }
+        .contact-item.active { background: var(--primary-black); color: white; }
+        .contact-item.active .last-msg { color: #aaa; }
+        .contact-item.active .c-name { color: white; }
+        /* IMPORTANT: object-fit cover ensures images don't squash */
+        .c-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #eee; flex-shrink: 0; border: 1px solid #eee;}
+        .c-info { flex: 1; overflow: hidden; }
+        .c-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; color: var(--text-main); }
+        .last-msg { font-size: 0.8rem; color: var(--text-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Chat Window */
+        .chat-window { flex: 1; display: flex; flex-direction: column; background: white; position: relative; }
+        .chat-header { padding: 1rem 2rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        
+        .chat-user-info { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 5px 10px; border-radius: 8px; transition: 0.2s; }
+        .chat-user-info:hover { background-color: #F9FAFB; }
+        
+        .chat-user-info h3 { font-size: 1rem; font-weight: 700; }
+        .chat-user-info span { font-size: 0.75rem; color: var(--text-gray); }
+        .status-dot { display: inline-block; width: 8px; height: 8px; background: #10B981; border-radius: 50%; margin-right: 5px; }
+        
+        .header-icons i { font-size: 1.2rem; color: #9CA3AF; margin-left: 15px; cursor: pointer; }
+
+        .messages-area { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; background: #fff; }
+        .message { display: flex; width: 100%; }
+        .message.incoming { justify-content: flex-start; }
+        .message.outgoing { justify-content: flex-end; }
+        .bubble { max-width: 60%; padding: 12px 18px; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; position: relative; animation: fadeInUp 0.3s ease-out; }
+        .incoming .bubble { background: var(--chat-bubble-in); color: var(--text-main); border-bottom-left-radius: 2px; }
+        .outgoing .bubble { background: var(--chat-bubble-out); color: white; border-bottom-right-radius: 2px; }
+        .msg-time { font-size: 0.7rem; margin-top: 5px; opacity: 0.7; text-align: right; display: block; }
+
+        .input-area { padding: 1.5rem 2rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 15px; }
+        .input-wrapper { flex: 1; background: #F9FAFB; border-radius: 30px; padding: 10px 20px; display: flex; align-items: center; }
+        .chat-input { flex: 1; background: transparent; border: none; outline: none; font-size: 0.95rem; margin: 0 10px; }
+        .send-btn { width: 45px; height: 45px; background: var(--primary-black); color: white; border-radius: 12px; border: none; display: grid; place-items: center; cursor: pointer; transition: 0.2s; }
+        .send-btn:hover { opacity: 0.9; }
+        .empty-chat { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-gray); }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 2000; }
+        .modal.active { display: flex; animation: fadeIn 0.2s ease-out forwards; }
+        .modal-content { background: white; padding: 2rem; border-radius: 16px; width: 400px; animation: scaleIn 0.3s ease-out forwards; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E5E7EB; padding-bottom: 1rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 8px; outline: none; }
+        .friend-select-list { max-height: 200px; overflow-y: auto; border: 1px solid #E5E7EB; border-radius: 8px; padding: 10px; }
+        .friend-option { display: flex; align-items: center; gap: 10px; padding: 8px; cursor: pointer; }
+        .friend-option:hover { background: #F9FAFB; }
+        .friend-checkbox { width: 18px; height: 18px; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem; }
+        .btn-cancel { background: white; border: 1px solid #E5E7EB; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-create-group { background: black; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        /* NEW CHAT MODAL */
+        .modal-friend-list { max-height: 150px; overflow-y: auto; border: 1px solid #E5E7EB; border-radius: 8px; margin-bottom: 15px; }
+        .modal-friend-item { padding: 10px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #F3F4F6; }
+        .modal-friend-item:hover { background: #F9FAFB; }
+        .modal-friend-item:last-child { border-bottom: none; }
+
+        /* VIEW PROFILE MODAL */
+        .profile-view-avatar { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px auto; display: block; object-fit: cover; border: 3px solid #E5E7EB; }
+        .profile-view-name { text-align: center; font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
+        .profile-view-role { text-align: center; color: #6B7280; font-size: 0.95rem; margin-bottom: 20px; }
+        .profile-info-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: var(--text-main); font-size: 0.9rem; }
+        .profile-info-row i { color: #9CA3AF; font-size: 1.1rem; }
+        .skill-tag { background: #F3F4F6; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: inline-block; margin: 2px; }
+
+        /* GROUP INFO MODAL */
+        .group-member-row { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #F9FAFB; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .member-name { font-size: 0.95rem; font-weight: 600; }
+        .member-email { font-size: 0.8rem; color: #6B7280; }
+        .group-header-info { text-align: center; margin-bottom: 20px; }
+        .group-header-avatar { width: 80px; height: 80px; border-radius: 50%; background: #000; color: white; display: grid; place-items: center; font-size: 2rem; margin: 0 auto 10px auto; font-weight: 700; }
+        .logo{ height: 60px; width: 60px; margin-top: 13px; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="brand"><div><img src="projectify.png" class="logo"></div><div>Projectify</div></div>
+        <div class="menu-title">Main Menu</div>
+        <a href="dashboard.html" class="nav-item"><i class="ri-dashboard-line"></i> Dashboard</a>
+        <a href="projects.html" class="nav-item"><i class="ri-folder-3-line"></i> Projects</a>
+        <a href="notification.html" class="nav-item"><i class="ri-notification-3-line"></i> Notifications</a>
+        <a href="#" class="nav-item active"><i class="ri-chat-1-fill"></i> Chat</a>
+        <a href="profile.html" class="nav-item"><i class="ri-user-line"></i> Profile</a>
+            <a href="about.html" class="nav-item"><i class="ri-information-line"></i> About Us</a>
+          <div class="user-profile">
+            <img src="" class="avatar-small" id="sidebarAvatar">
+            <div class="user-info"><h4 id="sidebarName">...</h4><span style="font-size:0.8rem;">Admin</span></div>
+            <i class="ri-logout-box-r-line" onclick="logout()" style="margin-left: auto; cursor: pointer; color: red;"></i>
+        </div>
+    </aside>
+
+    <div class="chat-layout">
+        <div class="message-list-panel">
+            <div class="msg-header">
+                <div class="msg-title-row">
+                    <h2>Messages</h2>
+                    <div class="add-btn" onclick="toggleDropdown()"><i class="ri-add-line"></i></div>
+                </div>
+                <div class="dropdown-menu" id="chatDropdown">
+                    <div class="dropdown-item" onclick="openGroupModal()"><i class="ri-group-line"></i> New Group</div>
+                    <div class="dropdown-item" onclick="openNewChatModal()"><i class="ri-user-add-line"></i> New Private Chat</div>
+                </div>
+                <div class="search-box">
+                    <i class="ri-search-line"></i>
+                    <input type="text" id="searchContacts" placeholder="Search chats...">
+                </div>
+            </div>
+            <div class="contacts-container" id="contactsList"><p style="color:gray; text-align:center; margin-top:20px;">Loading chats...</p></div>
+        </div>
+
+        <div class="chat-window">
+            <div class="empty-chat" id="emptyState">
+                <i class="ri-chat-smile-2-line" style="font-size: 3rem; margin-bottom: 10px;"></i><p>Select a chat to start messaging</p>
+            </div>
+            <div id="chatContent" style="display: none; flex-direction: column; height: 100%;">
+                <div class="chat-header">
+                    <div class="chat-user-info" id="headerUserInfo">
+                        <img src="" class="c-avatar" id="activeAvatar">
+                        <div><h3 id="activeName">...</h3><span><span class="status-dot"></span>Online</span></div>
+                    </div>
+                    <div class="header-icons"><i class="ri-information-line" id="infoIconBtn"></i></div>
+                </div>
+                <div class="messages-area" id="messagesContainer"></div>
+                <div class="input-area">
+                    <div class="input-wrapper"><input type="text" class="chat-input" id="messageInput" placeholder="Type a message..."></div>
+                    <button class="send-btn" onclick="sendMessage()"><i class="ri-send-plane-fill"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="newChatModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Start New Chat</h2><span onclick="closeNewChatModal()" style="cursor:pointer; font-size:1.5rem;">&times;</span></div>
+            <h4 style="font-size:0.9rem; color:#6B7280; margin-bottom:10px;">Your Friends</h4>
+            <div class="modal-friend-list" id="modalFriendList">
+                <p style="padding:10px; color:#999; font-size:0.85rem;">Loading friends...</p>
+            </div>
+            <div style="text-align:center; margin:15px 0; position:relative;">
+                <hr style="border:none; border-top:1px solid #eee;">
+                <span style="background:white; padding:0 10px; color:#999; font-size:0.8rem; position:absolute; top:-10px; left:50%; transform:translateX(-50%);">OR</span>
+            </div>
+            <div class="form-group"><label>Invite New Friend (Email)</label><input type="email" id="newFriendEmail" placeholder="friend@gmail.com"></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeNewChatModal()">Cancel</button><button class="btn-create-group" onclick="sendFriendRequest()">Send Request</button></div>
+        </div>
+    </div>
+
+    <div class="modal" id="groupModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Create New Group</h2><span onclick="closeGroupModal()" style="cursor:pointer; font-size:1.5rem;">&times;</span></div>
+            <div class="form-group"><label>Group Name</label><input type="text" id="groupName" placeholder="e.g. Design Team"></div>
+            <div class="form-group"><label>Select Members</label><div class="friend-select-list" id="friendSelectionList"></div></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeGroupModal()">Cancel</button><button class="btn-create-group" onclick="createGroup()">Create Group</button></div>
+        </div>
+    </div>
+
+    <div class="modal" id="viewProfileModal">
+        <div class="modal-content">
+            <div style="text-align:right;"><span onclick="closeViewProfileModal()" style="cursor:pointer; font-size:1.5rem;">&times;</span></div>
+            <img id="vpAvatar" src="" class="profile-view-avatar">
+            <h2 id="vpName" class="profile-view-name">...</h2>
+            <p id="vpRole" class="profile-view-role">User</p>
+            <hr style="border:none; border-top:1px solid #eee; margin:15px 0;">
+            <div class="profile-info-row"><i class="ri-mail-line"></i> <span id="vpEmail">...</span></div>
+            <div class="profile-info-row"><i class="ri-map-pin-line"></i> <span id="vpLocation">Unknown Location</span></div>
+            <div style="margin-top:10px;">
+                <h4 style="font-size:0.9rem; margin-bottom:5px;">About</h4>
+                <p id="vpAbout" style="font-size:0.85rem; color:#555;">No bio available.</p>
+            </div>
+             <div style="margin-top:15px;">
+                <h4 style="font-size:0.9rem; margin-bottom:5px;">Skills</h4>
+                <div id="vpSkills"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="groupInfoModal">
+        <div class="modal-content">
+            <div style="text-align:right;"><span onclick="closeGroupInfoModal()" style="cursor:pointer; font-size:1.5rem;">&times;</span></div>
+            <div class="group-header-info">
+                <div id="giAvatar" class="group-header-avatar">G</div>
+                <h2 id="giName" class="profile-view-name">Group Name</h2>
+                <p id="giCount" style="color:gray; font-size:0.9rem;">...</p>
+            </div>
+            <hr style="border:none; border-top:1px solid #eee; margin:10px 0;">
+            <h4 style="margin-bottom:10px; font-size:0.95rem;">Members</h4>
+            <div id="groupMembersList" style="max-height:250px; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDL6UGG7s7o-MC24qpHS77LgY54jxD0sRI",
+            authDomain: "taskmanagement-60f9b.firebaseapp.com",
+            projectId: "taskmanagement-60f9b",
+            storageBucket: "taskmanagement-60f9b.firebasestorage.app",
+            messagingSenderId: "761115679422",
+            appId: "1:761115679422:web:ee166eb1935bd360aa9cef",
+            measurementId: "G-F55KPBTQ3G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let activeChatId = null;
+        let activeChatEmail = null;
+        let friendsListCache = []; 
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // Fetch User Profile for Sidebar
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                let userPhoto = user.photoURL;
+                if (userSnap.exists() && userSnap.data().profileImage) {
+                    userPhoto = userSnap.data().profileImage;
+                } else if (!userPhoto) {
+                    userPhoto = `https://ui-avatars.com/api/?name=${user.displayName}`;
+                }
+                
+                document.getElementById('sidebarName').innerText = user.displayName || "User";
+                document.getElementById('sidebarAvatar').src = userPhoto;
+                
+                loadContactsAndGroups();
+            } else { window.location.href = "login.html"; }
+        });
+
+        async function loadContactsAndGroups() {
+            const container = document.getElementById('contactsList');
+            container.innerHTML = "";
+
+            // 1. Load Groups First
+            const groupQ = query(collection(db, "chats"), where("type", "==", "group"), where("members", "array-contains", currentUser.email));
+            onSnapshot(groupQ, (snapshot) => {
+                const existingGroupItems = document.querySelectorAll('.group-item');
+                existingGroupItems.forEach(e => e.remove());
+                snapshot.forEach(doc => {
+                    const group = doc.data();
+                    const div = document.createElement('div');
+                    div.className = "contact-item group-item";
+                    div.innerHTML = `<div class="c-avatar" style="background:#000; color:white; display:grid; place-items:center; font-weight:bold;">${group.name.charAt(0)}</div><div class="c-info"><div class="c-name">${group.name}</div><div class="last-msg">Group Chat</div></div>`;
+                    div.onclick = () => openChat(doc.id, group.name, `https://ui-avatars.com/api/?name=${group.name}&background=000&color=fff`, div, null);
+                    container.prepend(div); 
+                });
+            });
+
+            // 2. Load Friends with ASYNC Data Fetching
+            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+            if (userDoc.exists() && userDoc.data().friends) {
+                const friendEmails = userDoc.data().friends;
+                friendsListCache = []; 
+
+                // Create an array of Promises to fetch all friend data in parallel
+                const friendPromises = friendEmails.map(async (email) => {
+                    const q = query(collection(db, "users"), where("email", "==", email));
+                    const snapshot = await getDocs(q);
+                    
+                    let name = email.split('@')[0];
+                    let avatar = `https://ui-avatars.com/api/?name=${name}&background=000&color=fff`;
+
+                    if (!snapshot.empty) {
+                        const friendData = snapshot.docs[0].data();
+                        if (friendData.fullName) name = friendData.fullName;
+                        
+                        // CRITICAL: Ensure we use the Cloudinary image if it exists
+                        if (friendData.profileImage && friendData.profileImage.startsWith('http')) {
+                            avatar = friendData.profileImage;
+                        }
+                    }
+
+                    return { email, name, avatar };
+                });
+
+                // Wait for all database queries to finish
+                const friendsData = await Promise.all(friendPromises);
+                
+                friendsListCache = friendsData; // Store for modals
+
+                // Render the list
+                friendsData.forEach(friend => {
+                    const ids = [currentUser.email, friend.email].sort();
+                    const chatId = ids.join("_");
+                    const div = document.createElement('div');
+                    div.className = "contact-item friend-item";
+                    div.setAttribute('data-name', friend.name.toLowerCase()); 
+                    
+                    // Use onerror to fallback if Cloudinary URL is broken
+                    div.innerHTML = `
+                        <img src="${friend.avatar}" class="c-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${friend.name}'">
+                        <div class="c-info">
+                            <div class="c-name">${friend.name}</div>
+                            <div class="last-msg">Private Chat</div>
+                        </div>
+                    `;
+                    div.onclick = () => openChat(chatId, friend.name, friend.avatar, div, friend.email);
+                    container.appendChild(div);
+                });
+
+            } else { container.innerHTML = "<p style='padding:20px; text-align:center; color:gray;'>No friends yet.</p>"; }
+        }
+
+        function openChat(chatId, name, avatar, element, email) {
+            document.querySelectorAll('.contact-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('emptyState').style.display = "none";
+            document.getElementById('chatContent').style.display = "flex";
+            document.getElementById('activeName').innerText = name;
+            document.getElementById('activeAvatar').src = avatar;
+            
+            activeChatId = chatId;
+            activeChatEmail = email; 
+
+            const headerInfo = document.getElementById('headerUserInfo');
+            const infoIcon = document.getElementById('infoIconBtn');
+
+            if (email) {
+                headerInfo.onclick = () => viewFriendProfile(email);
+                infoIcon.onclick = () => viewFriendProfile(email);
+            } else {
+                headerInfo.onclick = () => viewGroupInfo(chatId);
+                infoIcon.onclick = () => viewGroupInfo(chatId);
+            }
+            loadMessages(chatId);
+        }
+
+        function loadMessages(chatId) {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = "";
+            const q = query(collection(db, "chats", chatId, "messages"), orderBy("timestamp", "asc"));
+            onSnapshot(q, (snapshot) => {
+                container.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const isMe = data.sender === currentUser.email;
+                    const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : "..";
+                    container.innerHTML += `<div class="message ${isMe ? 'outgoing' : 'incoming'}"><div class="bubble">${data.text}<span class="msg-time">${time}</span></div></div>`;
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if(!text || !activeChatId) return;
+            input.value = "";
+            try { await addDoc(collection(db, "chats", activeChatId, "messages"), { text: text, sender: currentUser.email, timestamp: serverTimestamp() }); } catch(e) { console.error(e); }
+        }
+        document.getElementById('messageInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+
+        // --- SEARCH FUNCTIONALITY ---
+        document.getElementById('searchContacts').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            document.querySelectorAll('.contact-item').forEach(item => {
+                const name = item.querySelector('.c-name').innerText.toLowerCase();
+                item.style.display = name.includes(val) ? 'flex' : 'none';
+            });
+        });
+
+        // --- MODALS ---
+        window.toggleDropdown = () => document.getElementById('chatDropdown').classList.toggle('show');
+        
+        window.openNewChatModal = () => {
+            document.getElementById('newChatModal').classList.add('active');
+            document.getElementById('chatDropdown').classList.remove('show');
+            const list = document.getElementById('modalFriendList');
+            list.innerHTML = "";
+            if(friendsListCache.length === 0) {
+                list.innerHTML = "<p style='padding:10px; color:#999; font-size:0.85rem;'>No friends added yet.</p>";
+            } else {
+                friendsListCache.forEach(friend => {
+                    const ids = [currentUser.email, friend.email].sort();
+                    const chatId = ids.join("_");
+                    list.innerHTML += `
+                        <div class="modal-friend-item" onclick="startDirectChat('${chatId}', '${friend.name}', '${friend.avatar}')">
+                            <img src="${friend.avatar}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=${friend.name}'">
+                            <span>${friend.name}</span>
+                        </div>
+                    `;
+                });
+            }
+        };
+        window.closeNewChatModal = () => document.getElementById('newChatModal').classList.remove('active');
+
+        window.startDirectChat = (chatId, name, avatar) => {
+            closeNewChatModal();
+            const existingItem = Array.from(document.querySelectorAll('.contact-item')).find(el => el.querySelector('.c-name').innerText === name);
+            if(existingItem) existingItem.click();
+            else {
+                 document.getElementById('emptyState').style.display = "none";
+                 document.getElementById('chatContent').style.display = "flex";
+                 document.getElementById('activeName').innerText = name;
+                 document.getElementById('activeAvatar').src = avatar;
+                 activeChatId = chatId;
+                 loadMessages(chatId);
+            }
+        };
+
+        window.sendFriendRequest = async () => {
+            const email = document.getElementById('newFriendEmail').value.trim();
+            if(!email) return alert("Please enter an email");
+            if(email === currentUser.email) return alert("You cannot add yourself");
+
+            try {
+                const alreadyFriend = friendsListCache.some(f => f.email === email);
+                if(alreadyFriend) { return alert("Already in your friend list!"); }
+
+                await addDoc(collection(db, "notifications"), {
+                    toEmail: email,
+                    fromEmail: currentUser.email,
+                    fromName: currentUser.displayName || "User",
+                    title: "New Friend Request",
+                    message: `${currentUser.displayName || 'Someone'} wants to add you as a friend.`,
+                    type: "friend_request",
+                    senderUid: currentUser.uid,
+                    timestamp: serverTimestamp(),
+                    read: false
+                });
+                alert("Friend Request Sent!");
+                closeNewChatModal();
+                document.getElementById('newFriendEmail').value = "";
+            } catch(e) { alert("Error: " + e.message); }
+        }
+
+        // --- PROFILE & GROUP INFO ---
+        window.viewFriendProfile = async (email) => {
+            document.getElementById('viewProfileModal').classList.add('active');
+            document.getElementById('vpName').innerText = "Loading...";
+            
+            const q = query(collection(db, "users"), where("email", "==", email));
+            const snapshot = await getDocs(q);
+            
+            if (!snapshot.empty) {
+                const data = snapshot.docs[0].data();
+                document.getElementById('vpName').innerText = data.fullName || email.split('@')[0];
+                document.getElementById('vpEmail').innerText = email;
+                document.getElementById('vpRole').innerText = data.role || "User";
+                document.getElementById('vpLocation').innerText = data.location || "Unknown";
+                document.getElementById('vpAbout').innerText = data.about || "No bio available.";
+                document.getElementById('vpAvatar').src = data.profileImage || `https://ui-avatars.com/api/?name=${data.fullName}`;
+                
+                const skillsContainer = document.getElementById('vpSkills');
+                skillsContainer.innerHTML = "";
+                if(data.skills) {
+                    data.skills.forEach(skill => {
+                        skillsContainer.innerHTML += `<span class="skill-tag">${skill}</span>`;
+                    });
+                } else { skillsContainer.innerHTML = "<span style='color:gray; font-size:0.8rem;'>No skills listed</span>"; }
+
+            } else {
+                document.getElementById('vpName').innerText = email.split('@')[0];
+                document.getElementById('vpEmail').innerText = email;
+                document.getElementById('vpAbout').innerText = "User profile not found.";
+            }
+        };
+        window.closeViewProfileModal = () => document.getElementById('viewProfileModal').classList.remove('active');
+
+        window.openGroupModal = () => { 
+            document.getElementById('groupModal').classList.add('active'); 
+            document.getElementById('chatDropdown').classList.remove('show'); 
+            const list = document.getElementById('friendSelectionList'); 
+            list.innerHTML = ""; 
+            if(friendsListCache.length === 0) {
+                list.innerHTML = "<p style='color:gray;'>No friends to add.</p>";
+                return;
+            }
+            friendsListCache.forEach(friend => { 
+                list.innerHTML += `<label class="friend-option"><input type="checkbox" class="friend-checkbox" value="${friend.email}"><span>${friend.name}</span></label>`; 
+            }); 
+        };
+        window.closeGroupModal = () => document.getElementById('groupModal').classList.remove('active');
+
+        window.createGroup = async () => {
+            const name = document.getElementById('groupName').value.trim();
+            if(!name) return alert("Enter group name");
+            
+            const checkboxes = document.querySelectorAll('.friend-checkbox:checked');
+            if(checkboxes.length === 0) return alert("Select at least one friend");
+
+            const members = [currentUser.email];
+            checkboxes.forEach(cb => members.push(cb.value));
+
+            try {
+                await addDoc(collection(db, "chats"), {
+                    name: name,
+                    members: members,
+                    type: "group",
+                    admin: currentUser.email,
+                    createdAt: serverTimestamp()
+                });
+                alert("Group Created!");
+                closeGroupModal();
+            } catch(e) { console.error(e); alert("Error creating group"); }
+        };
+
+        window.viewGroupInfo = async (chatId) => {
+            document.getElementById('groupInfoModal').classList.add('active');
+            const docSnap = await getDoc(doc(db, "chats", chatId));
+            if(docSnap.exists()) {
+                const data = docSnap.data();
+                document.getElementById('giName').innerText = data.name;
+                document.getElementById('giCount').innerText = `${data.members.length} Members`;
+                document.getElementById('giAvatar').innerText = data.name.charAt(0).toUpperCase();
+                
+                const list = document.getElementById('groupMembersList');
+                list.innerHTML = "";
+                
+                for (const email of data.members) {
+                    const q = query(collection(db, "users"), where("email", "==", email));
+                    const snap = await getDocs(q);
+                    let mName = email.split('@')[0];
+                    let mAvatar = `https://ui-avatars.com/api/?name=${mName}`;
+                    
+                    if(!snap.empty) {
+                         const d = snap.docs[0].data();
+                         if(d.fullName) mName = d.fullName;
+                         if(d.profileImage) mAvatar = d.profileImage;
+                    }
+
+                    list.innerHTML += `
+                    <div class="group-member-row">
+                        <img src="${mAvatar}" class="member-avatar" onerror="this.src='https://ui-avatars.com/api/?name=${mName}'">
+                        <div><div class="member-name">${mName}</div><div class="member-email">${email}</div></div>
+                    </div>`;
+                }
+            }
+        };
+        window.closeGroupInfoModal = () => document.getElementById('groupInfoModal').classList.remove('active');
+        
+        window.logout = () => signOut(auth).then(() => window.location.href = "login.html");
+    </script>
+</body>
+</html>
