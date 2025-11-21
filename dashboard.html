@@ -216,7 +216,7 @@
 
                 document.getElementById('sidebarName').innerText = user.displayName || "User";
                 document.getElementById('sidebarAvatar').src = userPhoto;
-                document.getElementById('greeting').innerText = `Good Morning, ${user.displayName ? user.displayName.split(' ')[0] : 'Friend'}!`;
+                document.getElementById('greeting').innerText = `Weલકome, ${user.displayName ? user.displayName.split(' ')[0] : 'Friend'}!`;
                 
                 loadUserProjects(user.email);
                 loadUserTasks(user.email);
@@ -361,4 +361,5 @@
         window.closeModal = () => document.getElementById('projectModal').classList.remove('active');
     </script>
 </body>
+
 </html>
